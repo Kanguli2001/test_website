@@ -17,8 +17,25 @@
         </div>
 
         <div class="navbar-end gap-2">
-            <a href="#" class="btn btn-ghost btn-sm">Sign In</a>
-            <a href="#" class="btn btn-primary btn-sm">Sign Up</a>
+            @auth
+                <span class="text-sm"> {{ auth()->user()->name }}</span>
+
+                <form action="/logout" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
+                </form>
+
+            @else
+
+            <a href="/login" class="btn btn-ghost btn-sm">
+                Sign In
+            </a>
+
+            <a href="{{ route('register') }}" class="btn btn-primary btn-small">
+                Sign Up
+            </a>
+
+            @endauth
         </div>
 
         

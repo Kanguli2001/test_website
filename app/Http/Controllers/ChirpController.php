@@ -7,6 +7,8 @@ use App\Models\chirp;
 
 class ChirpController extends Controller
 {
+    use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
     public function index()
     {
         $chirps = chirp::with('user')->latest()->take(50)->get();
@@ -24,10 +26,11 @@ class ChirpController extends Controller
             'message.max'=> 'Your message is too long. Maximum length is 255 characters.',
         ]);
 
+
+
         //Create a new chirp
-        chirp::create([
+        $request->user()->chirps()->create([
             'message' => $validated['message'],
-            'user_id' => null,
         ]);
 
         //Redirect back to the homepage
@@ -37,11 +40,21 @@ class ChirpController extends Controller
 
     public function edit (chirp $chirp)
     {
+
+        $this->authorize('update', $chirp);
+
         return view('chirps.edit', compact('chirp'));
     }
 
     public function update(Request $request, chirp $chirp)
     {
+
+        /* if ($request->user()->cannot('update', $chirp)) {
+            abort(403);
+        }  */
+        $this->authorize('update', $chirp);
+
+
         $validated = $request->validate([
             'message' => 'required|string|max:255',
         ], [
@@ -58,6 +71,8 @@ class ChirpController extends Controller
 
     public function destroy (chirp $chirp)
     {
+
+        $this->authorize('delete', $chirp);
         $chirp->delete();
 
         return redirect('/')->with('success', 'Chirp deleted successfully!');
