@@ -7,8 +7,8 @@
     <div class="max-w-2xl mx-auto">
         <h1 class="text-3xl font-bold mt-8">Latest Chirps</h1>
 
-        <!-- Chirp Form -->
-
+        <!-- Chirp Form - Only for logged-in users -->
+        @auth
         <div class="card bg-base-100 shadow mt-8">
             <div class="card-body">
                 <form method="POST" action="/chirps">
@@ -33,6 +33,17 @@
                 </form>
             </div>
         </div>
+        @else
+        <div class="card bg-base-100 shadow mt-8">
+            <div class="card-body text-center">
+                <p class="text-lg">Sign in to share your thoughts and chirp with the community!</p>
+                <div class="mt-4 flex gap-2 justify-center">
+                    <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+                    <a href="{{ route('register') }}" class="btn btn-ghost">Register</a>
+                </div>
+            </div>
+        </div>
+        @endauth
 
 
         <div class="space-y-4 mt-8">

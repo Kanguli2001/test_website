@@ -33,7 +33,10 @@ class Register extends Controller
 
         Auth::login($user);
 
-        //redirect to homepage
-        return redirect('/')->with('success', 'Welcome to chirper!');
+        // Send email verification notification
+        $user->sendEmailVerificationNotification();
+
+        //redirect to email verification page
+        return redirect()->route('verification.notice')->with('success', 'Account created! Please verify your email.');
     }
 }

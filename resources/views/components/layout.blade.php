@@ -20,7 +20,7 @@
             @auth
                 <span class="text-sm"> {{ auth()->user()->name }}</span>
 
-                <form action="{{ route('/') }}" method="POST" class="inline">
+                <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
                 </form>
