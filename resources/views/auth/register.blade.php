@@ -1,5 +1,5 @@
 <x-layout>
-    <x-slot:title>
+    <x-slot name="title">Create Account</x-slot>
 
     <div>
         <div class="hero min-h-[calc(100vh-16rem)]">
@@ -66,13 +66,11 @@
                             <!-- Password -->
 
                             <label class="floating-label mb-6">
-                                <input type="password" 
-                                name="password" 
-                                placeholder="********" 
-                                value="{{ old('email') }}" 
-                                class="input input-bordered @error('password') input-error @enderror w-full" 
-                                required 
-                                autofocus 
+                                <input type="password"
+                                name="password"
+                                placeholder="********"
+                                class="input input-bordered @error('password') input-error @enderror w-full"
+                                required
                                 />
 
                                 <span>Password</span>
@@ -89,13 +87,11 @@
                             @enderror
 
                             <label class="floating-label mb-6">
-                                <input type="password" 
-                                name="password_confirmation" 
-                                placeholder="********" 
-                                value="{{ old('email') }}" 
-                                class="input input-bordered" 
-                                required 
-                                autofocus 
+                                <input type="password"
+                                name="password_confirmation"
+                                placeholder="********"
+                                class="input input-bordered"
+                                required
                                 />
 
                                 <span>Confirm Password</span>
@@ -125,6 +121,4 @@
 
 
 
-
-    </x-slot:title>
 </x-layout>

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\chirp;
+use App\Models\Chirp;
 
 class ChirpController extends Controller
 {
@@ -11,7 +11,7 @@ class ChirpController extends Controller
 
     public function index()
     {
-        $chirps = chirp::with('user')->latest()->take(50)->get();
+        $chirps = Chirp::with('user')->latest()->take(50)->get();
         
         return view('home', ['chirps' => $chirps]);
     }
@@ -38,7 +38,7 @@ class ChirpController extends Controller
 
     }
 
-    public function edit (chirp $chirp)
+    public function edit (Chirp $chirp)
     {
 
         $this->authorize('update', $chirp);
@@ -46,7 +46,7 @@ class ChirpController extends Controller
         return view('chirps.edit', compact('chirp'));
     }
 
-    public function update(Request $request, chirp $chirp)
+    public function update(Request $request, Chirp $chirp)
     {
 
         /* if ($request->user()->cannot('update', $chirp)) {
@@ -69,7 +69,7 @@ class ChirpController extends Controller
         return redirect('/')->with('status', 'Chirp updated successfully!');
     }
 
-    public function destroy (chirp $chirp)
+    public function destroy (Chirp $chirp)
     {
 
         $this->authorize('delete', $chirp);
