@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\Login;
 use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\VerifyEmail;
 use App\Http\Controllers\Auth\ResendVerificationEmail;
+use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Middleware\RedirectIfEmailVerified;
 
 //Route::get("/", [ChirpController::class,"index"]);
@@ -54,5 +55,14 @@ Route::get('/email/verify/{id}/{hash}', VerifyEmail::class)
 Route::post('/email/resend', ResendVerificationEmail::class)
     ->middleware(['auth', 'throttle:6,1'])
     ->name('verification.send');
+
+// OAuth Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [OAuthController::class, 'redirectToGoogle'])->name('oauth.google');
+    Route::get('/auth/google/callback', [OAuthController::class, 'handleGoogleCallback']);
+
+    Route::get('/auth/github', [OAuthController::class, 'redirectToGitHub'])->name('oauth.github');
+    Route::get('/auth/github/callback', [OAuthController::class, 'handleGitHubCallback']);
+});
 
 

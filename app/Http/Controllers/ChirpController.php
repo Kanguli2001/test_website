@@ -9,9 +9,14 @@ class ChirpController extends Controller
 {
     use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-    public function index()
+    public function index(Request $request)
     {
         $chirps = Chirp::with('user')->latest()->take(50)->get();
+        
+        // Return JSON for API requests
+        if ($request->expectsJson()) {
+            return response()->json($chirps, 200);
+        }
         
         return view('home', ['chirps' => $chirps]);
     }
@@ -26,12 +31,15 @@ class ChirpController extends Controller
             'message.max'=> 'Your message is too long. Maximum length is 255 characters.',
         ]);
 
-
-
         //Create a new chirp
-        $request->user()->chirps()->create([
+        $chirp = $request->user()->chirps()->create([
             'message' => $validated['message'],
         ]);
+
+        // Return JSON for API requests
+        if ($request->expectsJson()) {
+            return response()->json($chirp, 201);
+        }
 
         //Redirect back to the homepage
         return redirect('/')->with('status', 'Chirp created successfully!');
@@ -48,12 +56,7 @@ class ChirpController extends Controller
 
     public function update(Request $request, Chirp $chirp)
     {
-
-        /* if ($request->user()->cannot('update', $chirp)) {
-            abort(403);
-        }  */
         $this->authorize('update', $chirp);
-
 
         $validated = $request->validate([
             'message' => 'required|string|max:255',
@@ -66,14 +69,23 @@ class ChirpController extends Controller
             'message' => $validated['message'],
         ]);
 
+        // Return JSON for API requests
+        if ($request->expectsJson()) {
+            return response()->json($chirp, 200);
+        }
+
         return redirect('/')->with('status', 'Chirp updated successfully!');
     }
 
-    public function destroy (Chirp $chirp)
+    public function destroy(Request $request, Chirp $chirp)
     {
-
         $this->authorize('delete', $chirp);
         $chirp->delete();
+
+        // Return JSON for API requests
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Chirp deleted successfully'], 204);
+        }
 
         return redirect('/')->with('success', 'Chirp deleted successfully!');
     }

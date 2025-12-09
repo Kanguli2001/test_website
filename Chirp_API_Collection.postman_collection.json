@@ -1,0 +1,384 @@
+{
+	"info": {
+		"name": "Chirp App API - Token Authentication",
+		"description": "Complete API collection with 60-minute token expiry",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "1. Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user and receive API token with 60-minute expiry"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    pm.environment.set(\"access_token\", pm.response.json().access_token);",
+									"    pm.environment.set(\"token_expires_at\", pm.response.json().expires_at);",
+									"    pm.environment.set(\"user_id\", pm.response.json().user.id);",
+									"    pm.test(\"Token received with expiry\", function () {",
+									"        pm.expect(pm.response.json().expires_in).to.equal(3600);",
+									"    });",
+									"}"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "2. Verify Email (Manual Step)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/email/verify",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"email",
+								"verify"
+							]
+						},
+						"description": "Manual step: Go to this page and click verification link from terminal logs"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login and receive new API token"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.environment.set(\"access_token\", pm.response.json().access_token);",
+									"    pm.environment.set(\"token_expires_at\", pm.response.json().expires_at);",
+									"    pm.test(\"Login successful\", function () {",
+									"        pm.expect(pm.response.json().message).to.include(\"Login successful\");",
+									"    });",
+									"}"
+									]
+							}
+						}
+					]
+				},
+				{
+					"name": "4. Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get current authenticated user profile"
+					},
+					"response": []
+				},
+				{
+					"name": "5. Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Refresh token before expiry (gets fresh 60-minute token)"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.environment.set(\"access_token\", pm.response.json().access_token);",
+									"    pm.environment.set(\"token_expires_at\", pm.response.json().expires_at);",
+									"    pm.test(\"Token refreshed with fresh 60-min expiry\", function () {",
+									"        pm.expect(pm.response.json().expires_in).to.equal(3600);",
+									"    });",
+									"}"
+									]
+							}
+						}
+					]
+				},
+				{
+					"name": "6. Logout User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Logout and revoke all user tokens"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chirps (Protected)",
+			"item": [
+				{
+					"name": "7. Get All Chirps",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/chirps",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chirps"
+							]
+						},
+						"description": "Get all chirps (requires valid token + email verification)"
+					},
+					"response": []
+				},
+				{
+					"name": "8. Create Chirp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"message\": \"Hello from API! Token expires at {{token_expires_at}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chirps",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chirps"
+							]
+						},
+						"description": "Create a new chirp (requires valid token + email verification)"
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    pm.environment.set(\"chirp_id\", pm.response.json().id);",
+									"    pm.test(\"Chirp created successfully\", function () {",
+									"        pm.expect(pm.response.json().message).to.include(\"Hello from API\");",
+									"    });",
+									"}"
+									]
+							}
+						}
+					]
+				},
+				{
+					"name": "9. Update Chirp",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"message\": \"Updated chirp message from API\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/chirps/{{chirp_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chirps",
+								"{{chirp_id}}"
+							]
+						},
+						"description": "Update a chirp (requires valid token + email verification)"
+					},
+					"response": []
+				},
+				{
+					"name": "10. Delete Chirp",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/chirps/{{chirp_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"chirps",
+								"{{chirp_id}}"
+							]
+						},
+						"description": "Delete a chirp (requires valid token + email verification)"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token_expires_at",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "chirp_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
